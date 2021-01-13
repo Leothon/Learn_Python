@@ -8,7 +8,7 @@ from bs4 import BeautifulSoup
 headers = {'User-Agent':'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) '
                         'Chrome/51.0.2704.63 Safari/537.36'}
 
-url = "https://www.zhihu.com/api/v4/questions/434263653/answers?include=data%5B%2A%5D.is_normal%2Cadmin_closed_comment%2Creward_info%2Cis_collapsed%2Cannotation_action%2Cannotation_detail%2Ccollapse_reason%2Cis_sticky%2Ccollapsed_by%2Csuggest_edit%2Ccomment_count%2Ccan_comment%2Ccontent%2Ceditable_content%2Cattachment%2Cvoteup_count%2Creshipment_settings%2Ccomment_permission%2Ccreated_time%2Cupdated_time%2Creview_info%2Crelevant_info%2Cquestion%2Cexcerpt%2Cis_labeled%2Cpaid_info%2Cpaid_info_content%2Crelationship.is_authorized%2Cis_author%2Cvoting%2Cis_thanked%2Cis_nothelp%2Cis_recognized%3Bdata%5B%2A%5D.mark_infos%5B%2A%5D.url%3Bdata%5B%2A%5D.author.follower_count%2Cbadge%5B%2A%5D.topics%3Bdata%5B%2A%5D.settings.table_of_content.enabled&limit=5&offset=5&platform=desktop&sort_by=default"
+url = "https://www.zhihu.com/api/v4/questions/{}/answers?include=data%5B%2A%5D.is_normal%2Cadmin_closed_comment%2Creward_info%2Cis_collapsed%2Cannotation_action%2Cannotation_detail%2Ccollapse_reason%2Cis_sticky%2Ccollapsed_by%2Csuggest_edit%2Ccomment_count%2Ccan_comment%2Ccontent%2Ceditable_content%2Cattachment%2Cvoteup_count%2Creshipment_settings%2Ccomment_permission%2Ccreated_time%2Cupdated_time%2Creview_info%2Crelevant_info%2Cquestion%2Cexcerpt%2Cis_labeled%2Cpaid_info%2Cpaid_info_content%2Crelationship.is_authorized%2Cis_author%2Cvoting%2Cis_thanked%2Cis_nothelp%2Cis_recognized%3Bdata%5B%2A%5D.mark_infos%5B%2A%5D.url%3Bdata%5B%2A%5D.author.follower_count%2Cbadge%5B%2A%5D.topics%3Bdata%5B%2A%5D.settings.table_of_content.enabled&limit=5&offset=0&platform=desktop&sort_by=default"
 
 
 class zhihu():
@@ -36,12 +36,13 @@ class zhihu():
         #循环次数
         page_number = content_page["totals"]
         print((self.current_page / page_number) * 100)
-        if self.current_page < page_number:
+        is_end = content_page["is_end"]
+        if is_end is not True:
             self.request(next_url)
-
         print("抓取完成")
 
     def request(self,url):
+        print(url)
         req = requests.get(url,headers = headers)
         req.encoding = 'utf-8'
         content = req.text
@@ -50,11 +51,12 @@ class zhihu():
     def download_img(self,img_url):
         r = requests.get(img_url, stream=True)
         if r.status_code == 200:
-            open('/Users/a10943/Desktop/%s.png'%time.time(), 'wb').write(r.content)  # 将内容写入图片
+            open('/Users/a10943/Desktop/img/%s.png'%time.time(), 'wb').write(r.content)  # 将内容写入图片
             print("done")
         del r
 
 
 if __name__ == '__main__':
     zhihu = zhihu()
-    zhihu.request(url)
+    id_ = input("请输入问题的ID：")
+    zhihu.request(url.format(id_))
